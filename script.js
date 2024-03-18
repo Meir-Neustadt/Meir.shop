@@ -1,8 +1,9 @@
 const root = document.querySelector('#root')
-const search = document.querySelector('#input')
+const search = document.querySelector('#f')
 const selector = document.querySelector('#selctor')
 const checkbox = document.querySelector('#checkbox')
-const payment = document.querySelector('#payment')
+const cartIcon = document.querySelector('#buttonCart')
+const deletion = document.querySelector('.z-0')
 
 const data = [
     {
@@ -38,7 +39,7 @@ const data = [
         "cat": "clothing",
         "name": "Dress",
         "price": "4000",
-        "image": "https://cdn.pixabay.com/photo/2016/06/29/04/17/wedding-dresses-1485984_150.jpg"
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_MSgkDZ3BYrrfCB7jhIp301FQIEjNNy5pZA&usqp=CAU"
     },
     {
         "id": "6",
@@ -52,7 +53,7 @@ const data = [
         "cat": "animals",
         "name": "Dog food",
         "price": "70",
-        "image": "https://cdn.pixabay.com/photo/2017/04/07/10/53/dog-2210717_150.jpg"
+        "image": "https://roasters.co.il/wp-content/uploads/2024/02/%D7%90%D7%99%D7%96%D7%94-%D7%92%D7%96%D7%A2-%D7%9B%D7%9C%D7%91%D7%99%D7%9D-%D7%9E%D7%AA%D7%90%D7%99%D7%9D-%D7%9C%D7%9A-%D7%A2%D7%9C-%D7%A4%D7%99-%D7%92%D7%9C%D7%92%D7%9C-%D7%94%D7%9E%D7%96%D7%9C%D7%95%D7%AA-%D7%A9%D7%9C%D7%9A.jpg"
     },
     {
         "id": "8",
@@ -64,108 +65,168 @@ const data = [
 ]
 
 let currentData = data
-let shoppingCart = []
-let requieredSorting = 'price'
-let searcheInput = ''
+let requieredSorting = 'name'
+let searchedInput = ''
 const list = []
+const cart = []
 
-
-const render = arr => {
-    root.innerHTML = ''
-    if(searcheInput.length != 0) arr = filterSearched(arr)
-    if(arr.length > 0){
-        sorting(arr,requieredSorting)
-        arr.map(item => root.append(createCard(item)))
-    } else root.innerHTML=`<h2>מצטערים, לא נמצאו פריטים התואמים לחיפושך</h2>`
-}
-
-const sorting = (arr, key) => {
-    switch (key) {
-        case 'price':
-            arr.sort((a, b) => a.price - b.price)
-            break
-        case 'price-desc':
-            arr.sort((a, b) => b.price - a.price)
-            break
-        case 'name':
-            arr.sort((a, b) => a.name.localeCompare(b.name))
+addToCart = (e) => {
+    let { id } = e.target
+    id = id.split('_')[1]
+    const product = data.find(el => el.id == id)
+    if (cart.includes(product)) {
+        product.quantity += 1
+    } else {
+        product.quantity = 1
+        cart.push(product)
     }
-}
+ }
 
-const filterAsChecked = (arr, list)=>{
-    currentData = (arr.filter(item => list.includes(item.cat)));
-}
-
-const filterSearched = arr => {
-    return arr.filter(item => item.name.toLowerCase().includes(searcheInput))
-}
-
-const addToCart = e => {
-    let id = e.target.id.split('_')[1]
-    let product = data.find(el => el.id == id)
-    addTo(product)
-    console.log(shoppingCart)
-}
-
-const addTo = product => {
-    if(! shoppingCart.some(el => el.id == product.id)) {
-        product = {...product, amount : 1}
-        shoppingCart.push(product)
-    }else{
-        product = shoppingCart.find(el => el.id == product.id)
-        product.amount += 1
-    }
-}
-
-const createCard = product => {
+const createCard = (product) => {
     const cardEl = document.createElement('div')
     cardEl.className = 'col-4 my-3'
     const innerCardEl = document.createElement('div')
     innerCardEl.className = 'card w-100'
-    innerCardEl.innerHTML = `<img src="${product.image}" class="card-img-top">
-        <div class="card-body bg-warning-subtle">
-            <div class="card-title">
-                <h2>${product.name}</h2>
-            </div>
-            <div class="card-text">
-                <h3>price: <b>${product.price}</b> $</h3>
-            </div>
-            <div class="d-flex justify-content-between"> 
-                <div class="text-end">
-                    category: <b>${product.cat}</b>
+    innerCardEl.innerHTML = `
+    <img src="${product.image}" class="card-img-top">
+    <div class="card-body bg-warning-subtle">
+        <div class="card-title">
+            <h2>${product.name}</h2>
+        </div>
+        <div class="card-text">
+            <h3>price: <b>${product.price}</b> $</h3>
+        </div>
+        <div class="d-flex justify-content-between"> 
+            <div class="text-end">
+                category: <b>${product.cat}</b>
                     id: <b>${product.id}</b>
-                </div>
             </div>
-        </div>`
+        </div>
+    </div>`
     const btn = document.createElement('button')
-    btn.className = "btn btn-primary"
-    btn.innerHTML = `Buy now ${product.cat === 'animals' ? product.name + "Mivza!!" : product.name}`
     btn.id = `btn_${product.id}`
+    btn.className = "btn btn-primary"
+    btn.innerHTML = `Buy now`
     btn.addEventListener('click', addToCart)
     innerCardEl.append(btn)
     cardEl.append(innerCardEl)
-    return cardEl
+    return cardEl;
 }
 
-const toPay = () => {
-    const shoppingList = []
-    let total = 0
-    shoppingCart.map(el => {
-        shoppingList.push(`${el.name} ${el.amount} ${el.price*el.amount}`)
-        total += el.price*el.amount
+const render = arr => {
+    root.innerHTML = ''
+    if (searchedInput.length != 0) arr = filterSearched(arr)
+    if (arr.length > 0) {
+        sorting(arr, requieredSorting)
+        arr.map(item => root.append(createCard(item)))
+    } else root.innerHTML = `<h2>מצטערים, לא נמצאו פריטים התואמים לחיפושך</h2>`
+}
+
+const filterSearched = arr => {
+    return arr.filter(item => item.name.toLowerCase().includes(searchedInput))
+}
+
+const sorting = (data, key) => {
+    switch (key) {
+        case 'low to high':
+            data.sort((a, b) => a.price - b.price)
+            break
+        case 'high to low':
+            data.sort((a, b) => b.price - a.price)
+            break
+        case 'name':
+            data.sort((a, b) => a.name.localeCompare(b.name))
+            break
+    }
+}
+
+const showModal = () => {
+    const modalBackground = document.createElement('div')
+    modalBackground.id = 'showCart'
+    modalBackground.className = 'modal-background fs-4 pt-5 mt-4'
+    const modalWindow = document.createElement('div')
+    modalWindow.className = 'my-modal bg-light m-auto'
+    document.body.prepend(modalBackground)
+    modalBackground.append(modalWindow)
+    const modalCloseBtn = document.createElement('button')
+    modalCloseBtn.className = 'btn-close bg-danger '
+    modalCloseBtn.addEventListener('click', closeModal)
+    modalWindow.append(modalCloseBtn)
+    const modalBodyEl = document.createElement('table')
+    modalBodyEl.id = 'modalBodyEl'
+    modalBodyEl.innerHTML += `<th scope="col">Product Name</th>
+    <th scope="col">Price</th><th scope="col">Quantity</th><th scope="col">Total</th>`
+    modalBodyEl.className = 'modal-body table table-striped m-0 bg-whith'
+    modalWindow.append(modalBodyEl)
+    cart.map(item => modalBodyEl.append(createCartItem(item)))
+    let total=0
+    cart.map(item => total += item.price*item.quantity)
+    const cartItem = document.createElement('div')
+    cartItem.id='cartItem'
+    cartItem.className='fs-3 text-center fw-bold bg-info-subtle p-3'
+    cartItem.innerHTML=`Total to pay: ` + total + '$'
+    modalBackground.append(cartItem)
+}
+const closeModal = () => {
+    const model = document.querySelector('.modal-background')
+    model.remove()
+    render(currentData)
+}
+
+const createCartItem = (product) => {
+    const cartItem = document.createElement('tr')
+    cartItem.innerHTML = `<td scope="col" class="fs-2 fw-semibold w-50"><img src="${product.image}" class="card-img-top w-25 pe-4">${product.name}</td>
+    <td scope="col">${product.price}$</td>`
+    const tdEL = document.createElement('td')
+    const buttons = document.createElement('div')
+    buttons.className='d-flex flex-row'
+    const minusBtn = document.createElement('button')
+    minusBtn.addEventListener('click', () => {
+        product.quantity-=1
+        if(product.quantity==0) cart.splice(cart.indexOf(product), 1)
+        closeModal()
+        if(cart.length>0) showModal()
     })
-    root.innerHTML = '<ul>'
-    shoppingList.map(el => root.innerHTML += `<li>${el}</li>`)
-    root.innerHTML += `</ul> <h2>total: ${total}</h2>`
+    minusBtn.innerHTML = '-';
+    const plusBtn = document.createElement('button')
+    plusBtn.innerHTML = '+';
+    buttons.append(minusBtn)
+    plusBtn.addEventListener('click',() => {
+        product.quantity+=1
+        closeModal()
+        showModal()
+    })
+    const quantity = document.createElement('div')
+    quantity.className='m-2'
+    buttons.append(quantity)
+    quantity.innerHTML= product.quantity
+    buttons.append(plusBtn)
+    tdEL.append(buttons)
+    cartItem.append(tdEL)
+    const sum = document.createElement('td')
+    sum.innerHTML=product.price * product.quantity + `$`
+    cartItem.append(sum)
+    return cartItem
 }
 
-////////// Main ///////////
+const filterForCheck = (data, list) => {
+    currentData = (data.filter(item => list.includes(item.cat)));
+}
+
+
+
+//main////////////
 
 
 render(currentData)
 
+
+
+//event listeners////////////
+
+
 search.addEventListener('input', e => {
-    searcheInput = e.target.value.toLowerCase()
+    searchedInput = e.target.value.toLowerCase()
     render(currentData)
 })
 
@@ -174,21 +235,25 @@ selector.addEventListener('change', e => {
     render(currentData)
 })
 
-checkbox.addEventListener('change', e => {
-    const category = e.target.name
-    const checked = e.target.checked
-    if(checked){
-        list.push(category)
-    }else{
-        const index = list.indexOf(category)
-        list.splice(index, 1)
-    }
-    if(list.length == 0) currentData = data
-    else filterAsChecked(data,list)
-    render(currentData)
+cartIcon.addEventListener('click', e => {
+    showModal()
 })
 
-payment.addEventListener('click', e => {
-    if(e.target.value == 'shop') render(currentData)
-    else toPay()
+checkbox.addEventListener('change', e => {
+    const name = e.target.name
+    const check = e.target.checked
+    if (check) {
+        list.push(name)
+    } else {
+        const index = list.indexOf(name)
+        list.splice(index, 1)
+    }
+    if (list.length == 0) {
+        currentData = data
+        render(currentData)
+    }
+    else {
+        filterForCheck(data, list)
+        render(currentData)
+    }
 })

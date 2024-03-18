@@ -2,20 +2,24 @@
 <html lang="en">
 
 <head>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="script.js" defer></script>
+    <script src="all.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-    <title>Supper</title>
+    <title>Supper cart</title>
 </head>
 
 <body>
-    <header class="text-center p-2 text-warning-emphasis">
-        <h1>Chesed Store</h1>
+    <header class="z-0 text-center p-2 text-warning-emphasis">
+        <h1>Chesed Store</h1>   
         <nav class="d-flex justify-content-start">
-                <input name="first" type="text" id="input" placeholder="search">
+            <input name="first" type="text" id="f" placeholder="search">
+            <div class="ms-2 mt-1"><i class="fa-solid fa-magnifying-glass"></i></div>
             <div id="checkbox" class="px-5">
                 <input type="checkbox" name="animals" id="animals">animals
                 <input type="checkbox" name="food" id="">food
@@ -24,19 +28,17 @@
             <div class="border border-warning border-bottom-0">
                 <label for="">sort by</label>
                 <select name="" id="selctor">
-                    <option value="price">price</option>
-                    <option value="price-desc">expensive</option>
                     <option value="name">name</option>
+                    <option value="low to high">low to high</option>
+                    <option value="high to low">high to low</option>
                 </select>
-                <select name="" id="payment">
-                    <option value="shop">shop</option>
-                    <option value="cart">cart</option>
-               </select>
-            </div>     
-        </nav>  
+            </div>        
+        </nav>
     </header>
     <hr>
+    <button id="buttonCart"><i class="fa-solid fa-cart-shopping z-1"></i></button>
     <div id="root" class="row container m-auto">
     </div>
 </body>
+<h2></h2>
 </html>
